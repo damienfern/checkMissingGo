@@ -5,6 +5,7 @@ import (
 	"./config/connection"
 	"./tvdb"
 	"fmt"
+	"regexp"
 )
 
 func main() {
