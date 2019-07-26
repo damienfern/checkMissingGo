@@ -7,8 +7,10 @@ import (
 	"./tvdb"
 	"fmt"
 	nested "github.com/antonfisher/nested-logrus-formatter"
+	tvdbApi "github.com/pioz/tvdb"
 	log "github.com/sirupsen/logrus"
 	"regexp"
+	"strconv"
 )
 
 func init() {
@@ -47,6 +49,7 @@ func main() {
 	if err2 != nil {
 		log.Fatal(err)
 	}
+	var missingEpisodes []*tvdbApi.Episode
 	listEpisodesFiles := []*file.EpisodeFile{
 		file.NewEpisodeFile(1, 1),
 		file.NewEpisodeFile(1, 2),
@@ -55,8 +58,20 @@ func main() {
 		file.NewEpisodeFile(1, 7),
 	}
 	seasonDir := file.NewSeasonDirSeasonV2(1, listEpisodesFiles)
-	missingEpisodes := seasonDir.CheckMissingEpisodes(&series)
-	fmt.Println(missingEpisodes)
+	missingEpisodes = append(missingEpisodes, seasonDir.CheckMissingEpisodes(&series)...)
+	listEpisodesFilesS2 := []*file.EpisodeFile{
+		file.NewEpisodeFile(2, 2),
+		file.NewEpisodeFile(2, 3),
+		file.NewEpisodeFile(2, 1),
+		file.NewEpisodeFile(2, 6),
+		file.NewEpisodeFile(2, 7),
+	}
+	season2Dir := file.NewSeasonDirSeasonV2(2, listEpisodesFilesS2)
+	missingEpisodes = append(missingEpisodes, season2Dir.CheckMissingEpisodes(&series)...)
+	fmt.Println("Les épisodes manquants pour la saison " + strconv.Itoa(seasonDir.SeasonID) + " sont :")
 
-	// Print the title of the episode 4x08 (season 4, episode 8)
+	for _, value := range missingEpisodes {
+		fmt.Println("S0" + strconv.Itoa(value.AiredSeason) + "E" + strconv.Itoa(value.AiredEpisodeNumber))
+	}
+
 }
