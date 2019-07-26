@@ -1,8 +1,8 @@
 package tvdb
 
 import (
-	"fmt"
 	"github.com/pioz/tvdb"
+	log "github.com/sirupsen/logrus"
 )
 
 func FindSeriesOrFail(name string, tvdbConnection *tvdb.Client) tvdb.Series {
@@ -10,9 +10,9 @@ func FindSeriesOrFail(name string, tvdbConnection *tvdb.Client) tvdb.Series {
 	if err != nil {
 		// The request response is a 404: this means no results have been found
 		if tvdb.HaveCodeError(404, err) {
-			fmt.Println("Series" + name + " not found")
+			log.Fatal("Series " + name + " not found in TVDB")
 		} else {
-			panic(err)
+			log.Fatal(err)
 		}
 	}
 	return series

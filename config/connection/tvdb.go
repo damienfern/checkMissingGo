@@ -3,6 +3,7 @@ package connection
 import (
 	"../env"
 	"github.com/pioz/tvdb"
+	log "github.com/sirupsen/logrus"
 )
 
 func ConnectToTVDB() tvdb.Client {
@@ -17,7 +18,7 @@ func ConnectToTVDB() tvdb.Client {
 
 	err := c.Login()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	return c
 }

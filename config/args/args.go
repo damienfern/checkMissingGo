@@ -1,13 +1,25 @@
 package args
 
-import "os"
+import (
+	"../../file"
+	"errors"
+	log "github.com/sirupsen/logrus"
+	"os"
+)
 
-func GetDirPathToSearch() string {
+func GetDirPathToSearch() (string, error) {
 	arg := getArgByIndex(1)
-	return arg
+	exists, err := file.Exists(arg)
+	if !exists {
+		err = errors.New("dir " + arg + " not found")
+	}
+	return arg, err
 }
 
 func getArgByIndex(index int) string {
+	if index >= len(os.Args) {
+		log.Fatalln("no arg")
+	}
 	arg := os.Args[index]
 	return arg
 }

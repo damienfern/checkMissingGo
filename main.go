@@ -3,14 +3,27 @@ package main
 import (
 	"./config/args"
 	"./config/connection"
+	"./file"
 	"./tvdb"
 	"fmt"
+	nested "github.com/antonfisher/nested-logrus-formatter"
+	log "github.com/sirupsen/logrus"
 	"regexp"
 )
 
+func init() {
+	log.SetFormatter(&nested.Formatter{
+		ShowFullLevel:   true,
+		TimestampFormat: "2006-01-02 15:04:05",
+	})
+}
+
 func main() {
 	c := connection.ConnectToTVDB()
-	path := args.GetDirPathToSearch()
+	path, err := args.GetDirPathToSearch()
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Println(path)
 	regexpFilePath := regexp.MustCompile("^/?(.+/)*(.+)$")
 	filePathArray := regexpFilePath.FindStringSubmatch(path)
