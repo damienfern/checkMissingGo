@@ -7,14 +7,13 @@ import (
 )
 
 func main() {
-	fmt.Println("Hello, Arch!")
-
 	env.LoadEnv()
 
 	c := tvdb.Client{
 		Apikey:   env.FindEnvVarOrFail("apiKey"),
 		Userkey:  env.FindEnvVarOrFail("userKey"),
 		Username: env.FindEnvVarOrFail("username"),
+		Language: env.FindEnvVarOrFail("language"),
 	}
 
 	err := c.Login()
