@@ -1,26 +1,15 @@
 package main
 
 import (
-	"./config/env"
+	"./config/args"
+	"./config/connection"
 	"fmt"
-	"github.com/pioz/tvdb"
 )
 
 func main() {
-	env.LoadEnv()
-
-	c := tvdb.Client{
-		Apikey:   env.FindEnvVarOrFail("apiKey"),
-		Userkey:  env.FindEnvVarOrFail("userKey"),
-		Username: env.FindEnvVarOrFail("username"),
-		Language: env.FindEnvVarOrFail("language"),
-	}
-
-	err := c.Login()
-	if err != nil {
-		panic(err)
-	}
-
+	c := connection.ConnectToTVDB()
+	path := args.GetDirPathToSearch()
+	fmt.Println(path)
 	series, err := c.BestSearch("Game of Thrones")
 	if err != nil {
 		panic(err)
