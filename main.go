@@ -3,6 +3,7 @@ package main
 import (
 	"./config/args"
 	"./config/connection"
+	"./tvdb"
 	"fmt"
 )
 
@@ -10,12 +11,13 @@ func main() {
 	c := connection.ConnectToTVDB()
 	path := args.GetDirPathToSearch()
 	fmt.Println(path)
-	series, err := c.BestSearch("Game of Thrones")
-	if err != nil {
-		panic(err)
-	}
+	regexpFilePath := regexp.MustCompile("^/?(.+/)*(.+)$")
+	filePathArray := regexpFilePath.FindStringSubmatch(path)
+	seriesName := filePathArray[len(filePathArray)-1]
 
-	err = c.GetSeriesEpisodes(&series, nil)
+	series := tvdb.FindSeriesOrFail(seriesName, &c)
+
+	err := c.GetSeriesEpisodes(&series, nil)
 	if err != nil {
 		panic(err)
 	}
