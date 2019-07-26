@@ -30,10 +30,20 @@ func main() {
 	seriesName := filePathArray[len(filePathArray)-1]
 
 	series := tvdb.FindSeriesOrFail(seriesName, &c)
+	listSeasonsDir, errListSeasonDirs := file.ListAllDirOnlyInDir(path)
+	/*
+		TODO : get all files recursively and do stuffs with regexs
+	*/
+	for _, element := range listSeasonsDir {
+		fmt.Println(element.Name())
+	}
+	if errListSeasonDirs != nil {
+		log.Fatalln(err)
+	}
 
-	err := c.GetSeriesEpisodes(&series, nil)
-	if err != nil {
-		panic(err)
+	error := c.GetSeriesEpisodes(&series, nil)
+	if error != nil {
+		log.Fatal(err)
 	}
 
 	// Print the title of the episode 4x08 (season 4, episode 8)
