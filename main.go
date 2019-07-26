@@ -30,22 +30,33 @@ func main() {
 	seriesName := filePathArray[len(filePathArray)-1]
 
 	series := tvdb.FindSeriesOrFail(seriesName, &c)
-	listSeasonsDir, errListSeasonDirs := file.ListAllDirOnlyInDir(path)
-	/*
-		TODO : get all files recursively and do stuffs with regexs
-	*/
-	for _, element := range listSeasonsDir {
-		fmt.Println(element.Name())
-	}
-	if errListSeasonDirs != nil {
-		log.Fatalln(err)
-	}
+	//listSeasonsDir, errListSeasonDirs := file.ListAllDirOnlyInDir(path)
+	///*
+	//	TODO : 2 ways to do it :
+	//				* get seasons one by one and then do stuff
+	//				* get all files recursively and do stuffs with regexs
+	// */
+	//for _, element := range listSeasonsDir {
+	//	fmt.Println(element.Name())
+	//}
+	//if errListSeasonDirs != nil {
+	//	log.Fatalln(err)
+	//}
 
-	error := c.GetSeriesEpisodes(&series, nil)
-	if error != nil {
+	err2 := c.GetSeriesEpisodes(&series, nil)
+	if err2 != nil {
 		log.Fatal(err)
 	}
+	listEpisodesFiles := []*file.EpisodeFile{
+		file.NewEpisodeFile(1, 1),
+		file.NewEpisodeFile(1, 2),
+		file.NewEpisodeFile(1, 3),
+		file.NewEpisodeFile(1, 6),
+		file.NewEpisodeFile(1, 7),
+	}
+	seasonDir := file.NewSeasonDirSeasonV2(1, listEpisodesFiles)
+	missingEpisodes := seasonDir.CheckMissingEpisodes(&series)
+	fmt.Println(missingEpisodes)
 
 	// Print the title of the episode 4x08 (season 4, episode 8)
-	fmt.Println(series.GetEpisode(4, 8).Overview)
 }
