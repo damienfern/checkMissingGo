@@ -32,46 +32,38 @@ func main() {
 	seriesName := filePathArray[len(filePathArray)-1]
 
 	series := tvdb.FindSeriesOrFail(seriesName, &c)
-	//listSeasonsDir, errListSeasonDirs := file.ListAllDirOnlyInDir(path)
-	///*
-	//	TODO : 2 ways to do it :
-	//				* get seasons one by one and then do stuff
-	//				* get all files recursively and do stuffs with regexs
-	// */
-	//for _, element := range listSeasonsDir {
-	//	fmt.Println(element.Name())
-	//}
-	//if errListSeasonDirs != nil {
-	//	log.Fatalln(err)
-	//}
+	listSeasonsDir, errListSeasonDirs := file.ListAllDirOnlyInDir(path)
+	/*
+		TODO : 2 ways to do it :
+					* get seasons one by one and then do stuff
+					* get all files recursively and do stuffs with regexs
+	*/
+	var allSeasons []*file.SeasonDir
+	for _, element := range listSeasonsDir {
+		one := file.NewSeasonDirSeason(element, path)
+		allSeasons = append(allSeasons, one)
+	}
+	if errListSeasonDirs != nil {
+		log.Fatalln(err)
+	}
 
 	err2 := c.GetSeriesEpisodes(&series, nil)
 	if err2 != nil {
 		log.Fatal(err)
 	}
 	var missingEpisodes []*tvdbApi.Episode
-	listEpisodesFiles := []*file.EpisodeFile{
-		file.NewEpisodeFile(1, 1),
-		file.NewEpisodeFile(1, 2),
-		file.NewEpisodeFile(1, 3),
-		file.NewEpisodeFile(1, 6),
-		file.NewEpisodeFile(1, 7),
-	}
-	seasonDir := file.NewSeasonDirSeasonV2(1, listEpisodesFiles)
-	missingEpisodes = append(missingEpisodes, seasonDir.CheckMissingEpisodes(&series)...)
-	listEpisodesFilesS2 := []*file.EpisodeFile{
-		file.NewEpisodeFile(2, 2),
-		file.NewEpisodeFile(2, 3),
-		file.NewEpisodeFile(2, 1),
-		file.NewEpisodeFile(2, 6),
-		file.NewEpisodeFile(2, 7),
-	}
-	season2Dir := file.NewSeasonDirSeasonV2(2, listEpisodesFilesS2)
-	missingEpisodes = append(missingEpisodes, season2Dir.CheckMissingEpisodes(&series)...)
-	fmt.Println("Les épisodes manquants pour la saison " + strconv.Itoa(seasonDir.SeasonID) + " sont :")
 
-	for _, value := range missingEpisodes {
-		fmt.Println("S0" + strconv.Itoa(value.AiredSeason) + "E" + strconv.Itoa(value.AiredEpisodeNumber))
+	for _, oneSeason := range allSeasons {
+		missingEpisodes = append(missingEpisodes, oneSeason.CheckMissingEpisodes(&series)...)
+	}
+
+	if len(missingEpisodes) > 0 {
+		fmt.Println("Missing episodes are :")
+		for _, value := range missingEpisodes {
+			fmt.Println("* S0" + strconv.Itoa(value.AiredSeason) + "E" + strconv.Itoa(value.AiredEpisodeNumber))
+		}
+	} else {
+		fmt.Println("No missing episodes")
 	}
 
 }

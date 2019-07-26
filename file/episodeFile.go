@@ -10,16 +10,12 @@ type EpisodeFile struct {
 	Filepath            string
 }
 
-func RealNewEpisodeFile(fileInfo os.FileInfo, rootpath string) *EpisodeFile {
+func NewEpisodeFile(fileInfo os.FileInfo, rootpath string) *EpisodeFile {
 	// TODO : Regex things
 	seasonID := 1
 	episodeID := 1
 	filepath := rootpath + "/" + fileInfo.Name()
 	return &EpisodeFile{SeasonID: seasonID, EpisodeID: episodeID, FileInfo: fileInfo, Filepath: filepath}
-}
-
-func NewEpisodeFile(seasonID int, episodeID int) *EpisodeFile {
-	return &EpisodeFile{SeasonID: seasonID, EpisodeID: episodeID}
 }
 
 func isEpisodeInEpisodeFileList(vs []*EpisodeFile, f func(file *EpisodeFile) bool) bool {

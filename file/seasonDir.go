@@ -13,11 +13,19 @@ type SeasonDir struct {
 	Filepath     string
 }
 
-func NewSeasonDir(seasonID int, episodeFiles []*EpisodeFile, fileInfo os.FileInfo, rootpath string) *SeasonDir {
-	return &SeasonDir{SeasonID: seasonID, EpisodeFiles: episodeFiles, FileInfo: fileInfo, Filepath: rootpath + "/" + fileInfo.Name()}
+func NewSeasonDirSeason(info os.FileInfo, rootpath string) *SeasonDir {
+	// TODO : regex thing
+	seasonID := 1
+	seasonDir := SeasonDir{SeasonID: seasonID, FileInfo: info, Filepath: rootpath + "/" + info.Name()}
+	seasonDir.fillEpisodeFiles()
+	return &seasonDir
 }
-func NewSeasonDirSeasonV2(seasonID int, episodeFiles []*EpisodeFile) *SeasonDir {
-	return &SeasonDir{SeasonID: seasonID, EpisodeFiles: episodeFiles}
+
+func (s *SeasonDir) fillEpisodeFiles() {
+	listEpisodesFiles, _ := ListAllFilesOnlyInDir(s.Filepath)
+	for _, oneFile := range listEpisodesFiles {
+		s.EpisodeFiles = append(s.EpisodeFiles, NewEpisodeFile(oneFile, s.Filepath))
+	}
 }
 
 func (s SeasonDir) toString() {
