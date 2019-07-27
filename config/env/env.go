@@ -1,20 +1,19 @@
 package env
 
 import (
-	"fmt"
 	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"os"
 )
 
 func LoadEnv() {
-	fmt.Println("Loading Env variable")
+	log.Info("Loading Env variable")
 	LoadEnvByFile()
 
 }
 
 func LoadEnvByFile() {
-	fmt.Println("Loading from .env file")
+	log.Info("Loading from .env file")
 
 	err := godotenv.Load()
 
