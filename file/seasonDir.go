@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/pioz/tvdb"
 	"os"
+	"regexp"
+	"strconv"
 )
 
 type SeasonDir struct {
@@ -14,8 +16,9 @@ type SeasonDir struct {
 }
 
 func NewSeasonDirSeason(info os.FileInfo, rootpath string) *SeasonDir {
-	// TODO : regex thing
-	seasonID := 1
+	regexpFilePath := regexp.MustCompile("^(Saison|Season) ([0-9]{1,2})$")
+	filePathArray := regexpFilePath.FindStringSubmatch(info.Name())
+	seasonID, _ := strconv.Atoi(filePathArray[2])
 	seasonDir := SeasonDir{SeasonID: seasonID, FileInfo: info, Filepath: rootpath + "/" + info.Name()}
 	seasonDir.fillEpisodeFiles()
 	return &seasonDir

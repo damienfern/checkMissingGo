@@ -2,6 +2,8 @@ package file
 
 import (
 	"os"
+	"regexp"
+	"strconv"
 )
 
 type EpisodeFile struct {
@@ -11,9 +13,10 @@ type EpisodeFile struct {
 }
 
 func NewEpisodeFile(fileInfo os.FileInfo, rootpath string) *EpisodeFile {
-	// TODO : Regex things
-	seasonID := 1
-	episodeID := 1
+	regexpFilePath := regexp.MustCompile("S([0-9]{2})E([0-9]{2})")
+	filePathArray := regexpFilePath.FindStringSubmatch(fileInfo.Name())
+	seasonID, _ := strconv.Atoi(filePathArray[1])
+	episodeID, _ := strconv.Atoi(filePathArray[2])
 	filepath := rootpath + "/" + fileInfo.Name()
 	return &EpisodeFile{SeasonID: seasonID, EpisodeID: episodeID, FileInfo: fileInfo, Filepath: filepath}
 }
