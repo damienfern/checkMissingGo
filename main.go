@@ -10,6 +10,7 @@ import (
 	tvdbApi "github.com/pioz/tvdb"
 	log "github.com/sirupsen/logrus"
 	"regexp"
+	"sort"
 	"strconv"
 )
 
@@ -33,11 +34,7 @@ func main() {
 
 	series := tvdb.FindSeriesOrFail(seriesName, &c)
 	listSeasonsDir, errListSeasonDirs := file.ListAllDirOnlyInDir(path)
-	/*
-		TODO : 2 ways to do it :
-					* get seasons one by one and then do stuff
-					* get all files recursively and do stuffs with regexs
-	*/
+
 	var allSeasons []*file.SeasonDir
 	for _, element := range listSeasonsDir {
 		one := file.NewSeasonDirSeason(element, path)
@@ -52,9 +49,23 @@ func main() {
 		log.Fatal(err)
 	}
 	var missingEpisodes []*tvdbApi.Episode
+	c.GetSeriesSummary(&series)
+	seasonsFromTvDB := series.Summary.AiredSeasons
+	var airedSeason []int
 
+	for _, oneSeasonFromTvDB := range seasonsFromTvDB {
+		converted, _ := strconv.Atoi(oneSeasonFromTvDB)
+		airedSeason = append(airedSeason, converted)
+	}
+	sort.Ints(airedSeason)
+	if airedSeason[0] == 0 {
+		airedSeason = airedSeason[1:] // We don't care about special episodes
+	}
 	for _, oneSeason := range allSeasons {
 		missingEpisodes = append(missingEpisodes, oneSeason.CheckMissingEpisodes(&series)...)
+		airedSeason = Filter(airedSeason, func(i int) bool {
+			return i != oneSeason.SeasonID
+		})
 	}
 
 	if len(missingEpisodes) > 0 {
@@ -62,8 +73,24 @@ func main() {
 		for _, value := range missingEpisodes {
 			fmt.Println("* S0" + strconv.Itoa(value.AiredSeason) + "E" + strconv.Itoa(value.AiredEpisodeNumber))
 		}
+		if len(airedSeason) > 0 {
+			fmt.Println("Missing seasons are :")
+			for _, value := range airedSeason {
+				fmt.Println("* Season " + strconv.Itoa(value))
+			}
+		}
 	} else {
 		fmt.Println("No missing episodes")
 	}
 
+}
+
+func Filter(vs []int, f func(int) bool) []int {
+	vsf := make([]int, 0)
+	for _, v := range vs {
+		if f(v) {
+			vsf = append(vsf, v)
+		}
+	}
+	return vsf
 }

@@ -18,6 +18,6 @@ Game of thrones
 ```
 
 ## Todo 
-* check missing seasons
+* ~~check missing seasons~~
 * multiple folders in args
 * an UI
